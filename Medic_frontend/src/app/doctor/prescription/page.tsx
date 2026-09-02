@@ -43,13 +43,14 @@ function PrescriptionBuilderContent() {
 
   const medications = ["Amoxicillin", "Metformin", "Azithromycin", "Atorvastatin", "Lisinopril", "Ibuprofen"];
   
-  const handleRunIntelligence = (e: React.FormEvent) => {
+  const handleRunIntelligence = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.medication) return;
     
     setIsEvaluating(true);
-    setTimeout(() => {
-      const result = evaluatePrescription(formData, state.healthRecords);
+    
+    try {
+      const result = await evaluatePrescription(formData, state.healthRecords);
       setAssessment(result);
       
       dispatch({
@@ -63,9 +64,11 @@ function PrescriptionBuilderContent() {
           status: result.riskLevel === "critical" ? "BLOCKED" : result.riskLevel === "high" ? "WARNING" : "SUCCESS"
         }
       });
-      
+    } catch (error) {
+      console.error("Evaluation failed", error);
+    } finally {
       setIsEvaluating(false);
-    }, 1500);
+    }
   };
 
   const handleSignNormal = () => {

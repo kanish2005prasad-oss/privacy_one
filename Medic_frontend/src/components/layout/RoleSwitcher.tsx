@@ -1,45 +1,58 @@
 "use client";
 
 import React from "react";
-import { useAppState } from "../../context/AppStateContext";
-import { UserRole } from "../../types/patient";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../context/AuthContext";
+import { LogOut, User, LogIn, UserPlus } from "lucide-react";
+import Link from "next/link";
 
 export const RoleSwitcher = () => {
-  const { state, dispatch } = useAppState();
+  const { user, profile, loading, signOut } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
 
-  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newRole = e.target.value as UserRole;
-    dispatch({ type: "SET_ROLE", payload: newRole });
-    
-    // Auto-navigate to respective dashboard if on landing page or switching roles
-    if (pathname === "/" || pathname?.startsWith("/patient") || pathname?.startsWith("/doctor") || pathname?.startsWith("/pharmacy")) {
-      if (newRole === "patient") router.push("/patient");
-      else if (newRole === "doctor") router.push("/doctor");
-      else if (newRole === "pharmacy") router.push("/pharmacy");
-    }
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/");
   };
 
+  if (loading) {
+    return <div className="h-9 w-24 bg-surface-elevated animate-pulse rounded-lg"></div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center gap-2">
+        <Link href="/auth/login" className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted hover:text-foreground transition-colors">
+          <LogIn size={14} />
+          <span>Login</span>
+        </Link>
+        <Link href="/auth/signup" className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+          <UserPlus size={14} />
+          <span>Sign up</span>
+        </Link>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center gap-2">
-      <select
-        value={state.currentRole}
-        onChange={handleRoleChange}
-        className="bg-surface-elevated border border-border text-foreground text-xs sm:text-sm rounded-lg focus:ring-primary focus:border-primary block py-2 px-3 outline-none appearance-none cursor-pointer pr-8 font-medium hover:border-foreground/30 transition-colors"
-        style={{
-          backgroundImage: `url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")`,
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'right 0.7rem top 50%',
-          backgroundSize: '0.65rem auto',
-        }}
-        aria-label="Switch User Role"
+    <div className="flex items-center gap-4">
+      <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-surface-elevated border border-border rounded-lg">
+        <User size={14} className="text-primary" />
+        <span className="text-sm font-medium text-foreground">
+          {profile?.full_name || user.email}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize ml-2 border border-primary/20">
+          {profile?.role || "User"}
+        </span>
+      </div>
+      
+      <button 
+        onClick={handleSignOut}
+        className="flex items-center justify-center p-2 text-muted hover:text-danger hover:bg-danger/10 rounded-lg transition-colors border border-transparent hover:border-danger/20"
+        title="Sign Out"
       >
-        <option value="patient">Patient Role</option>
-        <option value="doctor">Doctor Role</option>
-        <option value="pharmacy">Pharmacy Role</option>
-      </select>
+        <LogOut size={16} />
+      </button>
     </div>
   );
 };

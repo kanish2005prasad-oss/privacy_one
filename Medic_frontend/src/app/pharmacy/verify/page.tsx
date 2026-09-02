@@ -28,6 +28,42 @@ function PharmacyVerifyContent() {
   const currentLocation = "Chennai Pharmacy #104";
 
   useEffect(() => {
+    const runVerificationFlow = async (rx: Prescription) => {
+      setPhase("VERIFYING_SIG");
+      
+      // Simulate signature verification delay
+      setTimeout(async () => {
+        setPhase("FRAUD_CHECK");
+        
+        try {
+          const fraudCheck = await evaluateFraudRisk(rx, currentLocation, state.pharmacyTransactions);
+          
+          if (fraudCheck.isBlocked && fraudCheck.alert) {
+            dispatch({ type: "ADD_FRAUD_ALERT", payload: fraudCheck.alert });
+            
+            dispatch({
+              type: "ADD_AUDIT_EVENT",
+              payload: {
+                id: `AUD-${Date.now()}`,
+                timestamp: new Date().toISOString(),
+                actor: "Fraud Detection Engine",
+                eventType: "FRAUD_ANALYSIS",
+                description: fraudCheck.alert.reason,
+                referenceId: rx.id,
+                status: "BLOCKED"
+              }
+            });
+          }
+          
+          setFraudResult(fraudCheck);
+        } catch (error) {
+          console.error("Fraud verification failed", error);
+        } finally {
+          setPhase("RESULT");
+        }
+      }, 1500);
+    };
+
     if (id) {
       const rx = state.prescriptions.find(p => p.id === id);
       if (rx) {
@@ -39,39 +75,7 @@ function PharmacyVerifyContent() {
     } else {
       router.push("/pharmacy");
     }
-  }, [id, state.prescriptions, router]);
-
-  const runVerificationFlow = (rx: Prescription) => {
-    setPhase("VERIFYING_SIG");
-    
-    setTimeout(() => {
-      setPhase("FRAUD_CHECK");
-      
-      setTimeout(() => {
-        const fraudCheck = evaluateFraudRisk(rx, currentLocation, state.pharmacyTransactions);
-        
-        if (fraudCheck.isBlocked && fraudCheck.alert) {
-          dispatch({ type: "ADD_FRAUD_ALERT", payload: fraudCheck.alert });
-          
-          dispatch({
-            type: "ADD_AUDIT_EVENT",
-            payload: {
-              id: `AUD-${Date.now()}`,
-              timestamp: new Date().toISOString(),
-              actor: "Fraud Detection Engine",
-              eventType: "FRAUD_ANALYSIS",
-              description: fraudCheck.alert.reason,
-              referenceId: rx.id,
-              status: "BLOCKED"
-            }
-          });
-        }
-        
-        setFraudResult(fraudCheck);
-        setPhase("RESULT");
-      }, 2000);
-    }, 2000);
-  };
+  }, [id, state.prescriptions, router, state.pharmacyTransactions, dispatch]);
 
   const handleDispense = () => {
     if (!prescription) return;

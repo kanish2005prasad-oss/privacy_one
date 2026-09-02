@@ -1,87 +1,67 @@
 import { HealthRecord } from "../types/health-record";
 import { AIAssessment, RiskLevel, Finding, Alternative } from "../types/ai";
 import { Prescription } from "../types/prescription";
+import { checkClinicalSafety } from "./api";
 
-// Deterministic mock rules for hackathon
-export function evaluatePrescription(
+export async function evaluatePrescription(
   prescription: Partial<Prescription>,
   patientRecords: HealthRecord[]
-): AIAssessment {
+): Promise<AIAssessment> {
   
-  const findings: Finding[] = [];
-  const alternatives: Alternative[] = [];
-  let riskScore = 15; // Base low risk
-  let riskLevel: RiskLevel = "low";
+  // Format patient profile from records
+  const allergies = patientRecords.filter(r => r.category === "allergies").map(r => (r as any).name);
+  const conditions = patientRecords.filter(r => r.category === "diagnoses").map(r => (r as any).condition);
+  const medications = patientRecords.filter(r => r.category === "medications" && (r as any).status === "Active").map(r => (r as any).name);
   
-  const medicationName = prescription.medication?.toLowerCase() || "";
-  
-  // Extract specific record types
-  const allergies = patientRecords.filter(r => r.category === "allergies") as any[];
-  const labs = patientRecords.filter(r => r.category === "labs") as any[];
-  
-  // 1. ALLERGY RULE (e.g. Amoxicillin / Penicillin)
-  const hasPenicillinAllergy = allergies.some(a => a.name.toLowerCase().includes("penicillin"));
-  const isPenicillinClass = medicationName.includes("amoxicillin") || medicationName.includes("penicillin");
-  
-  if (hasPenicillinAllergy && isPenicillinClass) {
-    findings.push({
-      id: "F-ALLERGY-01",
-      description: "Patient has documented severe penicillin allergy. Proposed medication belongs to the flagged allergy class."
-    });
-    alternatives.push(
-      { medicationName: "Azithromycin", rationale: "No matching allergy detected for macrolide class." },
-      { medicationName: "Doxycycline", rationale: "Safe alternative for respiratory infections." }
-    );
-    riskScore = 97;
-    riskLevel = "critical";
-  }
-  
-  // 2. RENAL FUNCTION RULE
-  const abnormalRenal = labs.some(l => 
-    (l.name.toLowerCase().includes("creatinine") && l.status === "high") ||
-    (l.name.toLowerCase().includes("egfr") && l.status === "low")
-  );
-  const isNephrotoxic = medicationName.includes("ibuprofen") || medicationName.includes("lisinopril");
-  
-  if (abnormalRenal && isNephrotoxic && riskLevel !== "critical") {
-    findings.push({
-      id: "F-RENAL-01",
-      description: "Patient has documented abnormal renal function (elevated creatinine). Medication requires dosage adjustment or avoidance in renal impairment."
-    });
-    alternatives.push(
-      { medicationName: "Acetaminophen", rationale: "Hepatic metabolism, safer for renal impairment." }
-    );
-    riskScore = 82;
-    riskLevel = "high";
-  }
-
-  // 3. DRUG INTERACTION RULE
-  // For demo, let's say Atorvastatin + Azithromycin = Moderate/High
-  const activeMeds = patientRecords.filter(r => r.category === "medications" && r.status === "Active") as any[];
-  const takesStatin = activeMeds.some(m => m.name.toLowerCase().includes("statin"));
-  
-  if (takesStatin && medicationName.includes("azithromycin") && riskLevel !== "critical" && riskLevel !== "high") {
-    findings.push({
-      id: "F-INTERACTION-01",
-      description: "Potential interaction with active statin therapy. May increase risk of myopathy."
-    });
-    riskScore = 65;
-    riskLevel = "moderate";
-  }
-
-  // Safe Prescription
-  if (findings.length === 0) {
-    findings.push({
-      id: "F-SAFE-01",
-      description: "No significant contraindications, allergies, or severe interactions detected based on available patient data."
-    });
-  }
-
-  return {
-    riskScore,
-    riskLevel,
-    findings,
-    alternatives,
-    evaluatedAt: new Date().toISOString()
+  const patientProfile = {
+    condition: conditions.join(", ") || "Unknown",
+    current_medications: medications,
+    allergies: allergies
   };
+
+  const medicationName = prescription.medication || "";
+
+  try {
+    const aiResponse = await checkClinicalSafety(patientProfile, medicationName);
+    
+    // Convert backend risk score to risk level
+    let riskLevel: RiskLevel = "low";
+    if (aiResponse.risk_score >= 80) riskLevel = "critical";
+    else if (aiResponse.risk_score >= 60) riskLevel = "high";
+    else if (aiResponse.risk_score >= 40) riskLevel = "moderate";
+
+    const findings: Finding[] = aiResponse.interactions.map((interaction: any, i: number) => ({
+      id: `F-AI-${i}`,
+      description: `[${interaction.type.toUpperCase()}] ${interaction.description}`
+    }));
+
+    if (findings.length === 0) {
+      findings.push({
+        id: "F-SAFE-01",
+        description: aiResponse.explanation || "No significant contraindications, allergies, or severe interactions detected."
+      });
+    }
+
+    // Backend doesn't currently return alternatives, but we can structure it if it did
+    const alternatives: Alternative[] = [];
+
+    return {
+      riskScore: aiResponse.risk_score,
+      riskLevel: riskLevel,
+      findings,
+      alternatives,
+      evaluatedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error("Clinical Engine API Error:", error);
+    
+    // Fallback if API is down
+    return {
+      riskScore: 50,
+      riskLevel: "moderate",
+      findings: [{ id: "ERR", description: "AI engine unavailable. Proceed with caution." }],
+      alternatives: [],
+      evaluatedAt: new Date().toISOString()
+    };
+  }
 }

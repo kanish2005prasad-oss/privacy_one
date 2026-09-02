@@ -39,11 +39,14 @@ function ConsentApprovalContent() {
   const handleDecline = () => {
     dispatch({ type: "DENY_ACCESS_REQUEST", payload: request.id });
     
+    const timestamp = Date.now();
+    const isoString = new Date(timestamp).toISOString();
+
     dispatch({
       type: "ADD_AUDIT_EVENT",
       payload: {
-        id: `AUD-${Date.now()}`,
-        timestamp: new Date().toISOString(),
+        id: `AUD-${timestamp}`,
+        timestamp: isoString,
         actor: patient.name,
         eventType: "CONSENT_REVIEWED",
         description: `Denied access request from ${request.requesterName}.`,
