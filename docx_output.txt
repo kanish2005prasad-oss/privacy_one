@@ -1,0 +1,171 @@
+PATIENT-SOVEREIGNMEDICAL TRUST NETWORK
+Detailed Product Workflow & Hackathon Implementation Scenario
+Patient-controlled access • Cryptographic consent • AI prescription safety • Fraud detection
+1. Product Concept
+The platform is a patient-controlled healthcare trust network. The patient is the final authority over access to their medical records. Doctors and hospitals use a shared clinical dashboard; pharmacies and insurance companies use a shared verification/claims dashboard. Every important transaction is authenticated, digitally signed where appropriate, and recorded in an auditable trail.
+PATIENT   │   │ Consent / Digital Signature   ▼TRUST & CONSENT LAYER   ├── Identity & Authentication   ├── Access Control   ├── Digital Signatures   ├── Audit Ledger   └── Fraud Detection   │   ├───────────────┬──────────────────┐   ▼               ▼                  ▼Doctor/Hospital  Pharmacy          InsuranceDashboard        Dashboard         Dashboard   │               │                  │   └───────────────┼──────────────────┘                   ▼        AI CLINICAL INTELLIGENCE          ├── Safety Analysis          └── Fraud/Anomaly Analysis
+2. Three Dashboard Structure
+2.1 Patient Dashboard
+Health summary: medical records, prescriptions, active medicines, lab reports and allergies.
+Access Requests: incoming requests from doctors, hospitals, pharmacies and insurers.
+Consent Management: approve, reject, view, revoke and monitor access.
+Prescriptions: view signed prescriptions and AI safety explanations.
+Activity/Audit Timeline: every important access, prescription, verification and security event.
+Security Alerts: unauthorized access, invalid signatures, suspicious transactions and fraud alerts.
+Primary action: 'Who can access my data?'
+2.2 Doctor / Hospital Dashboard
+Shared dashboard for doctors and hospital staff with role-based permissions.
+Search patients and request only the required data fields.
+View records only after valid patient consent.
+Create prescriptions and run AI safety checks.
+Digitally sign prescriptions.
+Review hospital-level access and security activity.
+2.3 Pharmacy / Insurance Dashboard
+Shared business dashboard with role-based permissions.
+Pharmacy: verify prescriptions, check signature, expiry and redemption status.
+Pharmacy: record dispensing transactions.
+Insurance: verify prescription, dispensing and claim information.
+Insurance: submit/review claims and detect quantity/amount inconsistencies.
+Monitor fraud and anomaly alerts.
+3. Complete Product Workflow — Beginning to End
+Step 1 — Patient Registration
+The patient creates an account with basic identity information. The system creates a unique Patient ID and establishes the cryptographic identity used for consent and transaction verification.
+Patient  ↓Account creation  ↓Patient ID  ↓Secure cryptographic identity  ↓Patient Health Vault
+Step 2 — Medical Records Enter the Health Vault
+Records can originate from a hospital, doctor, diagnostic provider or patient upload. Important records are assigned a Record ID, issuer identity, timestamp, hash and digital signature/provenance metadata.
+Medical Record  ├── Diagnosis  ├── Prescription  ├── Lab Report  └── Allergy Information        ↓Record ID + Timestamp + Hash + Issuer
+Step 3 — Doctor/Hospital Requests Access
+The doctor does not automatically see the patient's complete medical history. The doctor selects the minimum fields required and provides a mandatory purpose and access duration.
+REQUEST ACCESSRequester: Dr. Arun / ABC HospitalData:  ☑ Current medications  ☑ Allergies  ☑ Previous prescriptions  ☐ Complete historyPurpose: Clinical consultationDuration: 4 hours        ↓SEND REQUEST
+Step 4 — Request Appears on Patient Dashboard
+The patient receives a clear request showing who wants access, exactly which data is requested, the reason, and how long the access will remain valid.
+ABC HOSPITALDr. Arun KumarWants:✓ Current medications✓ Allergies✓ Previous prescriptionsPurpose: Prescription consultationDuration: 4 hours[REJECT]   [APPROVE & SIGN]
+Step 5 — Patient Approves or Rejects
+The patient can reject the request immediately. If approved, the patient authenticates the action and creates a cryptographically verifiable consent.
+Reject → request closedApprove → authentication → digital signature → consent creation
+Step 6 — QR + Phone Biometric Fallback
+If the laptop has no fingerprint sensor, the web app generates a short-lived, one-time QR. The patient scans it with the registered phone. The phone displays the exact request and performs local fingerprint, face or PIN verification. The biometric itself is not sent to the server; the platform receives a cryptographic proof from the authentication mechanism.
+Laptop  ↓One-time QR  ↓Registered Patient Phone  ↓Show exact request  ↓Fingerprint / Face / PIN  ↓Cryptographic proof  ↓Server verification
+Step 7 — Consent Record Is Created
+After successful authentication, the system creates a scoped consent containing patient, requester, requested fields, purpose, expiry, timestamp, consent ID and signature.
+CONSENT C-83921Patient: P1029Requester: Dr. Arun / ABC HospitalData: Medications + Allergies + Previous PrescriptionsPurpose: Clinical consultationValid until: 02 Sep 2026, 2:30 PMPatient Signature: VALID ✓
+Step 8 — Doctor Gets Only Authorized Information
+The doctor dashboard displays only the data covered by the active consent. Unrequested insurance information or unrelated records remain inaccessible.
+PATIENT P1029🔐 Access granted by patient✓ Allergies✓ Current medications✓ Previous prescriptionsAccess expires: 2h 14mConsent: VERIFIED ✓
+Step 9 — Doctor Creates Prescription
+The doctor enters drug, dose, frequency, duration, route and clinical reason. The prescription is sent to the AI clinical safety engine before final signing.
+NEW PRESCRIPTIONDrug: Medicine XDose: 500 mgFrequency: 2/dayDuration: 7 daysRoute: OralReason: Bacterial infection        ↓RUN AI SAFETY CHECK
+Step 10 — AI Prescription Safety Analysis
+The AI/rule-based clinical engine compares the new prescription against the patient's authorized clinical context and a drug knowledge base. It checks allergies, drug-drug interactions, contraindications, dosage and relevant history.
+Patient Context + New Prescription + Drug Knowledge                    ↓          AI SAFETY ENGINE                    ↓Allergy | Interaction | Contraindication | Dosage | History                    ↓             Explainable Risk Score
+Step 11 — Explainable Risk Score
+The system returns a risk score and explains the factors behind it. The AI should advise rather than become the final clinical authority.
+AI PRESCRIPTION ANALYSISRisk Score: 87 / 100Risk Level: HIGH⚠ Allergy conflict⚠ Drug interaction⚠ Dosage anomalyRecommendation:Clinical review required
+Step 12 — Doctor Review / Override
+The doctor can modify the prescription or override the AI recommendation with a mandatory clinical justification. The override is itself recorded and signed.
+AI recommendation: HIGH RISKDoctor decision: OVERRIDEReason: __________________Doctor signature: ✓
+Step 13 — Doctor Digitally Signs Prescription
+The finalized prescription receives a cryptographic signature and integrity hash so later modification can be detected.
+Prescription RX99281Patient: P1029Drug: Medicine XAI Risk: 87/100Doctor: DR1928Hash: 7F83A1...Doctor Signature: VALID ✓
+Step 14 — Patient Receives Prescription
+The patient sees the prescription, AI explanation, issuing doctor and signature status from the patient dashboard.
+NEW PRESCRIPTIONDr. Arun / ABC HospitalMedicine X — 500 mg — 2/day — 7 daysAI Safety Score: 87/100Doctor Signature: VERIFIED ✓
+Step 15 — Pharmacy Verifies Prescription
+The pharmacy scans/enters the Prescription ID. The system verifies patient linkage, doctor identity, hospital, digital signature, expiry, usage status and tampering.
+Prescription RX99281Patient ✓Doctor ✓Hospital ✓Digital Signature ✓Not Expired ✓Not Already Used ✓Tampering Not Detected ✓        ↓PRESCRIPTION VERIFIED
+Step 16 — Pharmacy Dispenses and Records Transaction
+After dispensing, the pharmacy records the drug and quantity, timestamp and pharmacy identity. This creates a traceable transaction.
+RX99281Dispensed: Medicine XQuantity: 14Pharmacy: PH102Timestamp: 11:02 AMTransaction Signature: VALID ✓
+Step 17 — Insurance Claim
+The insurance side receives a claim and verifies it against the signed prescription and dispensing transaction.
+CLAIM #CL92831Patient: P1029Prescription: RX99281Medicine: Medicine XClaimed amount: ₹1,450Verify:✓ Prescription✓ Doctor signature✓ Patient authorization✓ Dispensing record✓ Quantity✓ Amount
+Step 18 — Continuous Fraud/Anomaly Detection
+The fraud engine analyzes access requests, signatures, prescription events, dispensing transactions and claims. It combines deterministic security rules with behavioral anomaly detection.
+ACCESSPRESCRIPTIONSIGNATUREDISPENSINGCLAIMLOGINRECORD MODIFICATION        ↓FRAUD / ANOMALY ENGINE        ↓Risk Score + Reason + Action
+Step 19 — Patient Audit Timeline
+The patient can see a chronological, human-readable history of important events, including who requested data, what was authorized, what was prescribed, what was dispensed and what suspicious attempts were blocked.
+09:10 Hospital → access requested → approved09:32 Doctor → prescription signed10:05 Patient → viewed prescription11:02 Pharmacy → verified and dispensed11:30 Insurance → claim submitted11:31 Fraud engine → claim risk 8/10012:10 Unknown device → access blocked
+4. Fraud Detection — Detailed Explanation
+Fraud detection in this problem statement should be interpreted broadly: the platform should identify suspicious medical-data and prescription transactions, tampering, unauthorized access, abnormal identity behavior, duplicate prescriptions and suspicious insurance claims. The system should flag anomalies for review rather than automatically accuse a person of fraud.
+4.1 Prescription Duplication
+Detect repeated or highly similar prescriptions for the same patient within an unusually short time window.
+Patient P10009:15 → Doctor A → Drug X → 30 units09:32 → Doctor B → Drug X → 30 units10:05 → Doctor C → Drug X → 30 unitsSignal:Same patient + same/similar drug + multiple providers + short interval→ Suspicious prescription pattern
+4.2 Prescription Tampering
+Cryptographic signatures and hashes detect modification after a prescription was signed.
+Original:Medicine X, 500 mgHash: A83F...Modified:Medicine X, 1000 mgHash: 92BC...Signature verification → INVALID→ Prescription integrity failure→ Block / alert
+4.3 Unauthorized Record Access
+Block requests where there is no valid patient consent, the consent has expired, requested scope exceeds consent, or the request signature is invalid.
+Requester: Unknown HospitalRequested: Complete medical historyPatient consent: NOT FOUNDSignature: INVALID→ ACCESS BLOCKED→ Patient notified
+4.4 Stolen / Abnormal Doctor Identity
+Detect unusual combinations such as a new device, unusual time, unusual location and abnormal prescription volume. These are risk signals, not proof of wrongdoing.
+Doctor DR102Normal: Chennai, 08:00–18:00Observed: Delhi, 03:14 AMNew deviceAbnormally high activity→ Identity anomaly→ High risk→ Verification required
+4.5 Pharmacy / Insurance Claim Anomaly
+Compare signed prescription quantity, pharmacy dispensing quantity and insurance claim quantity/amount.
+Prescription: 10 unitsDispensed: 10 unitsInsurance claim: 100 units→ Quantity mismatch→ Claim anomaly→ Manual review
+4.6 Prescription Replay / Duplicate Redemption
+Prevent a valid prescription from being reused after it has already been dispensed.
+RX99281Pharmacy A → already redeemedPharmacy B → tries RX99281 again→ Already used→ Replay / duplicate transaction detected→ Block
+5. Fraud Engine Architecture
+                    TRANSACTION                         │                         ▼               ┌─────────────────┐               │ Signature Check │               └────────┬────────┘                        │             ┌──────────┴──────────┐             ▼                     ▼        VALID SIGNATURE       INVALID SIGNATURE             │                     │             │                     └──> BLOCK + ALERT             ▼      Behavioral Analysis             │     ┌───────┼────────┬──────────┐     ▼       ▼        ▼          ▼ Duplicate  Location  Time     Claim Rx         anomaly   anomaly  mismatch     │       │        │          │     └───────┴────────┴──────────┘                     │                     ▼             FRAUD RISK SCORE                     │          ┌──────────┴──────────┐          ▼                     ▼       LOW/MEDIUM              HIGH          │                     │       Allow               Alert + Review
+6. Recommended Fraud Detection Approach
+Layer 1 — deterministic rules for hard security failures: invalid signature, missing consent, expired consent, prescription already redeemed, scope mismatch and quantity mismatch.
+Layer 2 — behavioral anomaly detection for unusual activity: access frequency, transaction frequency, device changes, location/time anomalies and unusual prescription patterns.
+Isolation Forest is a practical hackathon model for unsupervised anomaly detection because it does not require a huge labeled fraud dataset.
+Output should include risk score, detected signals, evidence and recommended action.
+Use terms such as 'suspicious activity', 'anomaly' and 'requires review' rather than claiming confirmed fraud.
+7. Data Required for the Prototype
+Dataset
+Purpose
+Example Fields
+Priority
+Synthetic patient/FHIR data
+Patient clinical history
+patient_id, conditions, allergies, meds, labs, encounters
+★★★★★
+Drug knowledge
+Prescription safety
+drug, class, contraindications, dosage, warnings
+★★★★★
+Drug interactions
+Interaction detection
+drug_a, drug_b, severity, explanation
+★★★★★
+Adverse drug events
+Clinical risk enrichment
+drug, adverse event, severity
+★★★★
+Synthetic access logs
+Access fraud
+requester, patient, fields, purpose, time, device, signature
+★★★★★
+Synthetic prescription transactions
+Prescription fraud
+doctor, patient, drug, quantity, location, time
+★★★★★
+Synthetic claims
+Insurance fraud
+prescription_id, dispensed_qty, claimed_qty, amount
+★★★★★
+For the hackathon, synthetic data is preferable to real patient data. A Synthea-generated patient dataset can provide realistic fictional clinical histories. Drug knowledge and interaction data can be combined with synthetic transactions and claims to create controlled fraud scenarios.
+8. Security and Cryptographic Model
+Do not store raw fingerprints on the server.
+Use phone/device biometric authentication through a secure mechanism such as WebAuthn/passkeys where feasible.
+The QR should contain only a short-lived request reference/nonce, not medical data.
+Use a one-time QR with a short expiry, for example 60 seconds.
+Store medical data off-chain/off-ledger; use hashes, signatures, consent records and an append-only audit layer for integrity/provenance.
+Each access should be scoped by requester, requested fields, purpose and expiry.
+Every security-sensitive action should create an audit event.
+9. Recommended 5-Minute Hackathon Demo
+Patient logs into the dashboard and shows medical records, allergies and pending access requests.
+Doctor/hospital dashboard requests only Current Medications + Allergies + Previous Prescriptions, with a mandatory purpose and expiry.
+Patient receives the request and approves it using the QR-to-phone biometric/PIN flow.
+Doctor sees only the authorized information and creates a prescription.
+AI instantly produces a safety score and explains allergy/interaction/dosage risk.
+Doctor reviews, modifies or signs the prescription.
+Pharmacy scans the prescription and receives 'Signature Verified / Not Expired / Not Redeemed'.
+Insurance claim is submitted and cross-checked against the signed prescription and dispensing record.
+Trigger a controlled fraud scenario: duplicate prescription, modified prescription, unauthorized access or claim quantity mismatch.
+Show the patient audit timeline where every event and blocked attempt is visible.
+10. Final Product Positioning / USP
+A patient-controlled healthcare network where doctors and hospitals request only the medical data they need, patients authorize access through cryptographic/phone-based authentication, AI evaluates prescriptions against the patient's clinical context, pharmacies and insurers verify signed transactions, and an intelligent fraud engine continuously detects tampering, unauthorized access, duplicate prescriptions and suspicious claims.
+Killer line for judges: "The patient doesn't just own their medical data — they can prove who accessed it, why they accessed it, what they accessed, and whether anything suspicious happened."

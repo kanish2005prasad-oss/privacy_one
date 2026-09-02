@@ -8,15 +8,14 @@
 
 ```
 📦 Hackathon_project/
-├── 🔐 crypto-trust-engine/     # Kanish's Module — Cryptographic Trust Layer (TypeScript/Node.js)
-├── 🤖 privacy-one/             # Aadhesh's Module — AI Clinical Safety & Fraud Detection (Python)
-└── 🖥️  Medic_frontend/         # Pooja's Module — Next.js Frontend (TypeScript/React)
+├── 🔐 crypto-trust-engine/     # Cryptographic Trust Layer (TypeScript/Node.js)
+├── 🤖 privacy-one/             # AI Clinical Safety & Fraud Detection (Python)
+└── 🖥️  Medic_frontend/         # Next.js Frontend (TypeScript/React)
 ```
 
 ---
 
 ## 🔐 Module 1: Crypto Trust Engine
-**Owner:** Kanish  
 **Tech:** TypeScript, Node.js  
 
 Implements the full cryptographic backbone of the platform:
@@ -39,7 +38,6 @@ npx ts-node demo_integration.ts
 ---
 
 ## 🤖 Module 2: AI Medical Security (privacy-one)
-**Owner:** Aadhesh  
 **Tech:** Python, ChromaDB, scikit-learn, Flask  
 
 Implements hybrid AI + deterministic safety checks:
@@ -61,7 +59,6 @@ API runs at `http://localhost:5000`
 ---
 
 ## 🖥️ Module 3: Frontend (Medic_frontend)
-**Owner:** Pooja  
 **Tech:** Next.js 16, TypeScript, TailwindCSS, Supabase  
 
 Full-featured dashboards for all roles:
