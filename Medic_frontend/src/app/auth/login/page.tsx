@@ -44,6 +44,28 @@ export default function LoginPage() {
     }
   };
 
+  const handleDemoQuickLogin = async (demoEmail: string, targetRole: string) => {
+    setEmail(demoEmail);
+    setPassword("Password123!");
+    setLoading(true);
+    setError(null);
+
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email: demoEmail,
+      password: "Password123!",
+    });
+
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+      return;
+    }
+
+    if (data.user) {
+      router.push(`/${targetRole}`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] flex">
       {/* Left Panel - Branding */}
@@ -101,9 +123,43 @@ export default function LoginPage() {
             <span className="text-lg font-bold text-white">MediTrust</span>
           </div>
 
-          <div className="mb-8">
+          <div className="mb-6">
             <h2 className="text-3xl font-bold text-white mb-2">Welcome back</h2>
-            <p className="text-gray-400">Sign in to your secure medical account</p>
+            <p className="text-gray-400 text-sm">Sign in to your secure medical account</p>
+          </div>
+
+          {/* Quick Demo Login Badges */}
+          <div className="mb-6 p-3.5 rounded-2xl bg-white/5 border border-white/10">
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+              <span>Quick Demo Sign-In</span>
+              <span className="text-primary text-[11px] lowercase">1-click login</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => handleDemoQuickLogin("patient@demo.com", "patient")}
+                className="p-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 text-blue-400 text-xs font-medium text-center transition-colors flex flex-col items-center gap-1"
+              >
+                <User size={15} />
+                <span>Patient</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDemoQuickLogin("doctor@demo.com", "doctor")}
+                className="p-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-400 text-xs font-medium text-center transition-colors flex flex-col items-center gap-1"
+              >
+                <Stethoscope size={15} />
+                <span>Doctor</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDemoQuickLogin("pharmacy@demo.com", "pharmacy")}
+                className="p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 text-xs font-medium text-center transition-colors flex flex-col items-center gap-1"
+              >
+                <Pill size={15} />
+                <span>Pharmacy</span>
+              </button>
+            </div>
           </div>
 
           {error && (
@@ -112,7 +168,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Email address</label>
               <div className="relative">
@@ -121,7 +177,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                  className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-sm"
                   placeholder="your@email.com"
                   required
                 />
@@ -136,7 +192,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                  className="w-full pl-11 pr-12 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-sm"
                   placeholder="••••••••"
                   required
                 />
@@ -153,17 +209,17 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 rounded-xl bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/25"
+              className="w-full py-3.5 rounded-xl bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/25 text-sm"
             >
               {loading ? (
-                <><Loader2 size={20} className="animate-spin" /> Signing in...</>
+                <><Loader2 size={18} className="animate-spin" /> Signing in...</>
               ) : (
-                <>Sign In <ArrowRight size={18} /></>
+                <>Sign In <ArrowRight size={16} /></>
               )}
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-white/10 text-center">
+          <div className="mt-6 pt-5 border-t border-white/10 text-center">
             <p className="text-gray-500 text-sm">
               Don&apos;t have an account?{" "}
               <Link href="/auth/signup" className="text-primary hover:text-primary/80 font-medium transition-colors">
@@ -172,7 +228,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-600">
+          <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-600">
             <Shield size={12} />
             <span>End-to-end encrypted • ECDSA-P256 signed</span>
           </div>

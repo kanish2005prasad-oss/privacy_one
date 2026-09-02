@@ -49,6 +49,9 @@ export const initialState: AppState = {
 
 export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
+    case "SET_FULL_STATE":
+      return action.payload;
+
     case "SET_ROLE":
       return { ...state, currentRole: action.payload };
       

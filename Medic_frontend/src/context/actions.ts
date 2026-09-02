@@ -3,8 +3,10 @@ import { AccessRequest, ConsentToken } from "../types/consent";
 import { Prescription } from "../types/prescription";
 import { AuditEvent } from "../types/audit";
 import { FraudAlert, PharmacyTransaction } from "../types/pharmacy";
+import { AppState } from "./reducer";
 
 export type AppAction =
+  | { type: "SET_FULL_STATE"; payload: AppState }
   | { type: "SET_ROLE"; payload: UserRole }
   | { type: "REGISTER_PATIENT"; payload: Patient }
   | { type: "INITIALIZE_VAULT"; payload: { patientId: string; publicKeyFingerprint: string; keyAlgorithm: string } }
